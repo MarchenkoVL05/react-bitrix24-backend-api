@@ -12,17 +12,18 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     workPosition: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
+      type: String,
       required: true,
     },
     role: {
       type: String,
       required: true,
+      default: "user",
     },
     approved: {
       type: Boolean,
       required: true,
+      default: false,
     },
   },
   {

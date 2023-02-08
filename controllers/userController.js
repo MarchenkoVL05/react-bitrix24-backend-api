@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 import UserModel from "../models/User.js";
+import CategoryModel from "../models/Category.js";
 
 class userController {
   static async registration(req, res) {
@@ -11,12 +12,18 @@ class userController {
 
       const passwordHash = await bcrypt.hash(password, salt);
 
+      const candidatWorkPosition = await CategoryModel.findOne({ categoryName: req.body.workPosition });
+
+      if (!candidatWorkPosition) {
+        return res.status(400).json({
+          message: "Должность не найдена",
+        });
+      }
+
       const doc = new UserModel({
         fullName: req.body.fullName,
         password: passwordHash,
-        workPosition: req.body.workPosition,
-        role: "user",
-        approved: false,
+        workPosition: candidatWorkPosition.categoryName,
       });
 
       const user = await doc.save();
@@ -27,7 +34,7 @@ class userController {
           role: user.role,
           approved: user.approved,
         },
-        "secret123",
+        process.env.SECRET_KEY,
         {
           expiresIn: "24h",
         }
@@ -66,8 +73,10 @@ class userController {
       const token = jwt.sign(
         {
           _id: user._id,
+          role: user.role,
+          approved: user.approved,
         },
-        "secret123",
+        process.env.SECRET_KEY,
         {
           expiresIn: "24h",
         }

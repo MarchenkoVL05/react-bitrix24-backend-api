@@ -14,7 +14,7 @@ const LessonSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    lessonCategory: {
+    categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
