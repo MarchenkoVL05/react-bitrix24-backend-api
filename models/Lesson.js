@@ -5,6 +5,7 @@ const LessonSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      unique: true,
     },
     content: {
       type: String,
@@ -13,6 +14,7 @@ const LessonSchema = new mongoose.Schema(
     videoUrl: {
       type: String,
       required: true,
+      unique: true,
     },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,

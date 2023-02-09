@@ -17,20 +17,32 @@ class categoryController {
   static async create(req, res) {
     const categoryName = req.body.categoryName;
 
-    const doc = new CategoryModel({
-      categoryName,
-    });
+    if (req.userInfo.role == "admin") {
+      const doc = new CategoryModel({
+        categoryName,
+      });
 
-    const category = await doc.save();
+      const category = await doc.save();
 
-    res.json(category);
+      return res.json(category);
+    } else {
+      res.status(500).json({
+        message: "У вас нет прав на создание категории",
+      });
+    }
   }
 
   static async remove(req, res) {
-    await CategoryModel.findByIdAndRemove(req.body.id);
-    res.status(200).json({
-      message: "Категория успешно удалена",
-    });
+    if (req.userInfo.role == "admin") {
+      await CategoryModel.findByIdAndRemove(req.body.id);
+      return res.status(200).json({
+        message: "Категория успешно удалена",
+      });
+    } else {
+      res.status(500).json({
+        message: "У вас нет прав на удаление категории",
+      });
+    }
     try {
     } catch (error) {
       console.log(error);
