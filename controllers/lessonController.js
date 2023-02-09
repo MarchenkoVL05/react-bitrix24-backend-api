@@ -10,19 +10,25 @@ class lessonController {
         return res.status(200).json(lessons);
       }
       if (req.userInfo.role == "user") {
-        const currentUser = await UserModel.findById(req.userInfo._id);
-        const workPosition = currentUser.workPosition;
+        if (req.userInfo.approved) {
+          const currentUser = await UserModel.findById(req.userInfo._id);
+          const workPosition = currentUser.workPosition;
 
-        const currentUserCategory = await CategoryModel.findOne({ categoryName: workPosition });
+          const currentUserCategory = await CategoryModel.findOne({ categoryName: workPosition });
 
-        if (!currentUserCategory) {
-          return res.status(500).json({
-            message: "Нет уроков для Вас",
+          if (!currentUserCategory) {
+            return res.status(500).json({
+              message: "Нет уроков для Вас",
+            });
+          }
+
+          const lessons = await LessonModel.find({ categoryId: currentUserCategory._id });
+          return res.status(200).json(lessons);
+        } else {
+          res.status(500).json({
+            message: "Вас ещё не допустили к курсам",
           });
         }
-
-        const lessons = await LessonModel.find({ categoryId: currentUserCategory._id });
-        return res.status(200).json(lessons);
       }
     } catch (error) {
       console.log(error);
@@ -56,7 +62,7 @@ class lessonController {
         });
       }
 
-      if (req.role == "admin") {
+      if (req.userInfo.role == "admin") {
         const doc = new LessonModel({
           title: req.body.title,
           content: req.body.content,
@@ -89,7 +95,7 @@ class lessonController {
         });
       }
 
-      if (req.role == "admin") {
+      if (req.userInfo.role == "admin") {
         await LessonModel.findByIdAndRemove(lessonId);
 
         return res.status(200).json({

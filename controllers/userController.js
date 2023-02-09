@@ -93,6 +93,72 @@ class userController {
       });
     }
   }
+
+  static async getAll(req, res) {
+    try {
+      if (req.userInfo.role == "admin") {
+        const allUsers = await UserModel.find();
+
+        if (!allUsers) {
+          return res.status(500).json({
+            message: "Ученики не найдены",
+          });
+        }
+
+        res.json(allUsers);
+      } else {
+        return res.status(500).json({
+          message: "У вас нет прав",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Не удалось загрузить учеников",
+      });
+    }
+  }
+
+  static async approve(req, res) {
+    try {
+      const userId = req.params.id;
+
+      if (req.userInfo.role == "admin") {
+        UserModel.findOneAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            approved: true,
+          },
+          {
+            returnDocument: "after",
+          },
+          (error, approvedUser) => {
+            if (error) {
+              return res.status(500).json({
+                message: "Не удалось одобрить ученика",
+              });
+            } else {
+              return res.json({
+                approvedUser,
+                message: "Ученик допущен к урокам",
+              });
+            }
+          }
+        );
+      } else {
+        return res.status(500).json({
+          message: "У вас нет прав",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Не удалось одобрить ученика",
+      });
+    }
+  }
 }
 
 export default userController;
