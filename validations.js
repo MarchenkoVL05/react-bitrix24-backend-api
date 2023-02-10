@@ -16,3 +16,8 @@ export const createLessonValidator = [
   body("content", "Описание урока должно быть заполнено").isLength({ min: 10 }),
   body("videoUrl", "Прикрепите ссылку на видео").isURL(),
 ];
+
+export const createQuestionValidator = [
+  body("questionTitle", "Придумайте вопрос").isLength({ min: 5 }),
+  body("inputType", "Выберите тип вопроса").isLength({ min: 5 }),
+];

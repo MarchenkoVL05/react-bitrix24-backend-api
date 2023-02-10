@@ -17,7 +17,7 @@ class lessonController {
           const currentUserCategory = await CategoryModel.findOne({ categoryName: workPosition });
 
           if (!currentUserCategory) {
-            return res.status(500).json({
+            return res.json({
               message: "Нет уроков для Вас",
             });
           }
@@ -41,7 +41,12 @@ class lessonController {
   static async getOne(req, res) {
     const lessonId = req.params.id;
 
-    const lesson = await LessonModel.findById(lessonId).populate("categoryId");
+    const lesson = await LessonModel.findById(lessonId).populate({
+      path: "questions",
+      populate: {
+        path: "options",
+      },
+    });
 
     if (!lesson) {
       return res.status(400).json({

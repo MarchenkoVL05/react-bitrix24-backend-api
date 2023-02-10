@@ -21,6 +21,12 @@ const LessonSchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
+    questions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Question",
+      },
+    ],
   },
   {
     timestamps: true,
