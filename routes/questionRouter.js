@@ -12,4 +12,7 @@ router.get("/", checkAuth, questionController.getAll);
 router.post("/", checkAuth, createQuestionValidator, handleValidationErrors, questionController.create);
 router.delete("/", checkAuth, questionController.remove);
 
+// Все результаты
+router.get("/all", checkAuth, questionController.allResults);
+
 export default router;

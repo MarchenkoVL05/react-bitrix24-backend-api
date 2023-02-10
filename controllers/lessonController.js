@@ -1,6 +1,9 @@
 import LessonModel from "../models/Lesson.js";
 import CategoryModel from "../models/Category.js";
 import UserModel from "../models/User.js";
+import ResultModel from "../models/Result.js";
+import QuestionModel from "../models/Question.js";
+import OptionModel from "../models/Option.js";
 
 class lessonController {
   static async getAll(req, res) {
@@ -94,17 +97,28 @@ class lessonController {
     try {
       const lessonId = req.body.lessonId;
       const lesson = await LessonModel.findById(lessonId);
+
       if (!lesson) {
         return res.status(400).json({
           message: "Урок не найден",
         });
       }
 
-      if (req.userInfo.role == "admin") {
+      if (req.userInfo.role === "admin") {
+        const questions = await QuestionModel.find({ lesson: lessonId });
+
+        // TODO: Тут баг, вариантам ответов не присвоены id вопросов,
+        // т.к. те ещё не известны на момент
+        // создания вопросов. Поэтому options не удаляются из БД
+        for (const question of questions) {
+          await OptionModel.deleteMany({ question: question._id });
+        }
+
+        await QuestionModel.deleteMany({ lesson: lessonId });
         await LessonModel.findByIdAndRemove(lessonId);
 
         return res.status(200).json({
-          message: "Урок успешно удалён",
+          message: "Урок и вопросы успешно удалены",
         });
       } else {
         return res.status(403).json({
@@ -113,8 +127,58 @@ class lessonController {
       }
     } catch (error) {
       console.log(error);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Не удалось удалить урок",
+      });
+    }
+  }
+
+  static async checkAnswers(req, res) {
+    try {
+      let score = 0;
+
+      const lessonId = req.params.id;
+      const userId = req.userInfo._id;
+      const answers = req.body.answers;
+
+      const lesson = await LessonModel.findById(lessonId).populate({
+        path: "questions",
+        populate: {
+          path: "options",
+        },
+      });
+
+      if (!lesson) {
+        return res.status(404).json({
+          message: "Урок не найден",
+        });
+      }
+
+      let questionCounter = 0;
+
+      lesson.questions.forEach((question) => {
+        questionCounter++;
+        question.options.forEach((option) => {
+          if (option.right && answers.includes(option._id.toString())) {
+            score++;
+          }
+        });
+      });
+
+      const userResult = new ResultModel({
+        user: userId,
+        lesson: lessonId,
+        score,
+        questionCounter,
+      });
+
+      await userResult.save();
+
+      res.json(userResult);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Не удалось сохранить резульат",
       });
     }
   }

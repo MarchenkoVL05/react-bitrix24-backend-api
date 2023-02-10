@@ -10,6 +10,14 @@ const ResultSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lesson",
     },
+    score: {
+      type: Number,
+      default: 0,
+    },
+    questionCounter: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

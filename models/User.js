@@ -25,12 +25,6 @@ const UserSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
-    results: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Result",
-      },
-    ],
   },
   {
     timestamps: true,
