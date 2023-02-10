@@ -14,7 +14,7 @@ export const loginValidator = [
 export const createLessonValidator = [
   body("title", "Название урока должно быть заполнено").isLength({ min: 10 }),
   body("content", "Описание урока должно быть заполнено").isLength({ min: 10 }),
-  body("videoUrl", "Прикрепите ссылку на видео").isURL(),
+  body("videoUrl", "Прикрепите ссылку на видео").isURL({ require_tld: false }),
 ];
 
 export const createQuestionValidator = [
