@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
+import cors from "cors";
 
 import router from "./routes/index.js";
 
@@ -12,6 +13,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // Загрузка видео на сервер
 app.use("/uploads", express.static("uploads"));
