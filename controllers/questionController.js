@@ -1,7 +1,6 @@
 import QuestionModel from "../models/Question.js";
 import LessonModel from "../models/Lesson.js";
 import OptionModel from "../models/Option.js";
-import ResultModel from "../models/Result.js";
 
 class questionController {
   static async getAll(req, res) {
@@ -107,31 +106,6 @@ class questionController {
       console.log(error);
       res.status(500).json({
         message: "Не удалось удалить вопрос",
-      });
-    }
-  }
-
-  static async allResults(req, res) {
-    try {
-      if (req.userInfo.role == "admin") {
-        const results = await ResultModel.find();
-
-        if (!results) {
-          res.status(200).json({
-            message: "Результатов ещё нет",
-          });
-        }
-
-        res.status(200).json(results);
-      } else {
-        res.status(403).json({
-          message: "У вас нет доступа",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        message: "Не удалось загрузить результаты",
       });
     }
   }

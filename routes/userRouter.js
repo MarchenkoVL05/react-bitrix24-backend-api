@@ -12,4 +12,7 @@ router.post("/login", loginValidator, handleValidationErrors, userController.log
 router.get("/all", checkAuth, userController.getAll);
 router.post("/:id", checkAuth, userController.approve);
 
+// Все результаты
+router.get("/results", checkAuth, userController.allResults);
+
 export default router;
