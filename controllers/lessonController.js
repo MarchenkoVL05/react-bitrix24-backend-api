@@ -107,11 +107,8 @@ class lessonController {
       if (req.userInfo.role === "admin") {
         const questions = await QuestionModel.find({ lesson: lessonId });
 
-        // TODO: Тут баг, вариантам ответов не присвоены id вопросов,
-        // т.к. те ещё не известны на момент
-        // создания вопросов. Поэтому options не удаляются из БД
         for (const question of questions) {
-          await OptionModel.deleteMany({ question: question._id });
+          await OptionModel.deleteMany({ _id: { $in: question.options } });
         }
 
         await QuestionModel.deleteMany({ lesson: lessonId });
