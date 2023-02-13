@@ -100,14 +100,14 @@ class userController {
         const allUsers = await UserModel.find();
 
         if (!allUsers) {
-          return res.status(500).json({
+          return res.status(400).json({
             message: "Ученики не найдены",
           });
         }
 
         res.json(allUsers);
       } else {
-        return res.status(500).json({
+        return res.status(403).json({
           message: "У вас нет прав",
         });
       }
@@ -148,7 +148,7 @@ class userController {
           }
         );
       } else {
-        return res.status(500).json({
+        return res.status(403).json({
           message: "У вас нет прав",
         });
       }

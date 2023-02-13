@@ -40,7 +40,7 @@ app.post("/upload", checkAuth, (req, res) => {
       return res.status(200).send(req.file);
     });
   } else {
-    return res.status(400).json({
+    return res.status(403).json({
       message: "Вы не можете загружать видео",
     });
   }

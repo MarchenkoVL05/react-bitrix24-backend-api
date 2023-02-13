@@ -17,7 +17,7 @@ class questionController {
 
         res.json(questions);
       } else {
-        res.status(500).json({
+        res.status(403).json({
           message: "У вас нет доступа",
         });
       }
@@ -72,7 +72,7 @@ class questionController {
           message: "Вопрос успешно создан",
         });
       } else {
-        return res.status(500).json({
+        return res.status(403).json({
           message: "Вы не можете создавать вопросы",
         });
       }
@@ -99,7 +99,7 @@ class questionController {
           message: "Вопрос успешно удалён",
         });
       } else {
-        res.status(500).json({
+        res.status(403).json({
           message: "Вы не можете удалять вопросы",
         });
       }
@@ -124,7 +124,7 @@ class questionController {
 
         res.status(200).json(results);
       } else {
-        res.status(500).json({
+        res.status(403).json({
           message: "У вас нет доступа",
         });
       }

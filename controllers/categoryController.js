@@ -26,7 +26,7 @@ class categoryController {
 
       return res.json(category);
     } else {
-      res.status(500).json({
+      res.status(403).json({
         message: "У вас нет прав на создание категории",
       });
     }
@@ -39,7 +39,7 @@ class categoryController {
         message: "Категория успешно удалена",
       });
     } else {
-      res.status(500).json({
+      res.status(403).json({
         message: "У вас нет прав на удаление категории",
       });
     }

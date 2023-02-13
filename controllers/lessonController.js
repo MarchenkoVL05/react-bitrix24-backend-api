@@ -28,7 +28,7 @@ class lessonController {
           const lessons = await LessonModel.find({ categoryId: currentUserCategory._id });
           return res.status(200).json(lessons);
         } else {
-          res.status(500).json({
+          res.status(403).json({
             message: "Вас ещё не допустили к курсам",
           });
         }
@@ -52,7 +52,7 @@ class lessonController {
     });
 
     if (!lesson) {
-      return res.status(400).json({
+      return res.status(404).json({
         message: "Урок не найден",
       });
     }
@@ -65,7 +65,7 @@ class lessonController {
       const lessonCategory = await CategoryModel.findOne({ _id: req.body.categoryId });
 
       if (!lessonCategory) {
-        return res.status(400).json({
+        return res.status(404).json({
           message: "Нет такой категории",
         });
       }
@@ -99,7 +99,7 @@ class lessonController {
       const lesson = await LessonModel.findById(lessonId);
 
       if (!lesson) {
-        return res.status(400).json({
+        return res.status(404).json({
           message: "Урок не найден",
         });
       }
