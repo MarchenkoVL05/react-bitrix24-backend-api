@@ -8,6 +8,7 @@ const router = new Router();
 
 router.post("/registration", registerValidator, handleValidationErrors, userController.registration);
 router.post("/login", loginValidator, handleValidationErrors, userController.login);
+router.get("/getMe", userController.getMe);
 
 router.get("/all", checkAuth, userController.getAll);
 router.post("/:id", checkAuth, userController.approve);

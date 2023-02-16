@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import UserModel from "../models/User.js";
 import CategoryModel from "../models/Category.js";
 import ResultModel from "../models/Result.js";
+import User from "../models/User.js";
 
 class userController {
   static async registration(req, res) {
@@ -91,6 +92,29 @@ class userController {
       console.log(err);
       res.status(500).json({
         message: "Не удалось авторизоваться",
+      });
+    }
+  }
+
+  static async getMe(req, res) {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.SECRET_KEY);
+      const userId = decoded._id;
+
+      const user = await UserModel.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({
+          message: "Пользователь не найден",
+        });
+      }
+
+      res.json(user);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "Нет доступа",
       });
     }
   }

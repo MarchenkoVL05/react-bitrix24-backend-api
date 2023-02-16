@@ -4,7 +4,7 @@ import checkAuth from "../utils/checkAuth.js";
 
 const router = new Router();
 
-router.get("/", checkAuth, categoryController.getAll);
+router.get("/", categoryController.getAll);
 router.post("/", checkAuth, categoryController.create);
 router.delete("/", checkAuth, categoryController.remove);
 
