@@ -146,7 +146,7 @@ class userController {
 
   static async approve(req, res) {
     try {
-      const userId = req.params.id;
+      const userId = req.body.userId;
 
       if (req.userInfo.role == "admin") {
         UserModel.findOneAndUpdate(
@@ -165,8 +165,9 @@ class userController {
                 message: "Не удалось одобрить ученика",
               });
             } else {
+              const updatedUser = { ...approvedUser._doc, approved: true };
               return res.json({
-                approvedUser,
+                approvedUser: updatedUser,
                 message: "Ученик допущен к урокам",
               });
             }

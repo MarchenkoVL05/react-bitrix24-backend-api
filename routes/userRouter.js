@@ -11,7 +11,7 @@ router.post("/login", loginValidator, handleValidationErrors, userController.log
 router.get("/getMe", userController.getMe);
 
 router.get("/all", checkAuth, userController.getAll);
-router.post("/:id", checkAuth, userController.approve);
+router.post("/approve", checkAuth, userController.approve);
 
 // Все результаты
 router.get("/results", checkAuth, userController.allResults);

@@ -13,8 +13,8 @@ class lessonController {
         return res.status(200).json(lessons);
       }
       if (req.userInfo.role == "user") {
-        if (req.userInfo.approved) {
-          const currentUser = await UserModel.findById(req.userInfo._id);
+        const currentUser = await UserModel.findById(req.userInfo._id);
+        if (currentUser.approved) {
           const workPosition = currentUser.workPosition;
 
           const currentUserCategory = await CategoryModel.findOne({ categoryName: workPosition });
@@ -29,7 +29,7 @@ class lessonController {
           return res.status(200).json(lessons);
         } else {
           res.status(403).json({
-            message: "Вас ещё не допустили к курсам",
+            message: req.userInfo.approved,
           });
         }
       }
