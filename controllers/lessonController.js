@@ -74,7 +74,7 @@ class lessonController {
         const doc = new LessonModel({
           title: req.body.title,
           content: req.body.content,
-          videoUrl: req.body.videoUrl,
+          videoUrl: "/uploads/" + req.file.filename,
           categoryId: req.body.categoryId,
         });
 
