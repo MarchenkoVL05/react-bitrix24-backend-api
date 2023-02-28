@@ -112,9 +112,10 @@ class lessonController {
         }
 
         await QuestionModel.deleteMany({ lesson: lessonId });
-        await LessonModel.findByIdAndRemove(lessonId);
+        const removedLesson = await LessonModel.findByIdAndRemove(lessonId);
 
         return res.status(200).json({
+          removedLesson,
           message: "Урок и вопросы успешно удалены",
         });
       } else {
