@@ -10,6 +10,9 @@ const router = new Router();
 
 router.get("/", checkAuth, lessonController.getAll);
 router.get("/:id", checkAuth, lessonController.getOne);
+// Поиск уроков
+router.post("/search", checkAuth, lessonController.searchLesson);
+
 router.post("/:id", checkAuth, lessonController.checkAnswers);
 router.post(
   "/",

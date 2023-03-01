@@ -8,6 +8,7 @@ import OptionModel from "../models/Option.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import Lesson from "../models/Lesson.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -144,6 +145,44 @@ class lessonController {
     }
   }
 
+  static async searchLesson(req, res) {
+    try {
+      const currentUser = await UserModel.findById(req.userInfo._id);
+      const workPosition = currentUser.workPosition;
+      const currentUserCategory = await CategoryModel.findOne({ categoryName: workPosition });
+
+      const regex = new RegExp(req.body.searchTitle, "i");
+
+      if (req.userInfo.role == "user") {
+        const lessons = await LessonModel.find({ title: regex, categoryId: currentUserCategory._id });
+
+        if (lessons.length === 0) {
+          return res.status(404).json({
+            message: "Такой урок не найден",
+          });
+        }
+
+        return res.json(lessons);
+      }
+
+      if (req.userInfo.role == "admin") {
+        const lessons = await LessonModel.find({ title: regex });
+
+        if (lessons.length === 0) {
+          return res.status(404).json({
+            message: "Такой урок не найден",
+          });
+        }
+
+        return res.json(lessons);
+      }
+    } catch (error) {
+      res.status(404).json({
+        message: "Такой урок не найден",
+      });
+    }
+  }
+
   static async checkAnswers(req, res) {
     try {
       let score = 0;
@@ -189,7 +228,7 @@ class lessonController {
     } catch (error) {
       console.log(error);
       res.status(500).json({
-        message: "Не удалось сохранить резульат",
+        message: "Не удалось сохранить результат",
       });
     }
   }
