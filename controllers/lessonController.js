@@ -1,14 +1,14 @@
-import LessonModel from "../models/Lesson.js";
-import CategoryModel from "../models/Category.js";
-import UserModel from "../models/User.js";
-import ResultModel from "../models/Result.js";
-import QuestionModel from "../models/Question.js";
-import OptionModel from "../models/Option.js";
+import LessonModel from '../models/Lesson.js';
+import CategoryModel from '../models/Category.js';
+import UserModel from '../models/User.js';
+import ResultModel from '../models/Result.js';
+import QuestionModel from '../models/Question.js';
+import OptionModel from '../models/Option.js';
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import Lesson from "../models/Lesson.js";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import Lesson from '../models/Lesson.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,24 +16,28 @@ const __dirname = path.dirname(__filename);
 class lessonController {
   static async getAll(req, res) {
     try {
-      if (req.userInfo.role == "admin") {
+      if (req.userInfo.role == 'admin') {
         const lessons = await LessonModel.find();
         return res.status(200).json(lessons);
       }
-      if (req.userInfo.role == "user") {
+      if (req.userInfo.role == 'user') {
         const currentUser = await UserModel.findById(req.userInfo._id);
         if (currentUser.approved) {
           const workPosition = currentUser.workPosition;
 
-          const currentUserCategory = await CategoryModel.findOne({ categoryName: workPosition });
+          const currentUserCategory = await CategoryModel.findOne({
+            categoryName: workPosition,
+          });
 
           if (!currentUserCategory) {
             return res.json({
-              message: "Нет уроков для Вас",
+              message: 'Нет уроков для Вас',
             });
           }
 
-          const lessons = await LessonModel.find({ categoryId: currentUserCategory._id });
+          const lessons = await LessonModel.find({
+            categoryId: currentUserCategory._id,
+          });
           return res.status(200).json(lessons);
         } else {
           res.status(403).json({
@@ -44,45 +48,53 @@ class lessonController {
     } catch (error) {
       console.log(error);
       res.status(500).json({
-        message: "Не удалось загрузить уроки",
+        message: 'Не удалось загрузить уроки',
       });
     }
   }
 
   static async getOne(req, res) {
-    const lessonId = req.params.id;
+    try {
+      const lessonId = req.params.lessonId;
 
-    const lesson = await LessonModel.findById(lessonId).populate({
-      path: "questions",
-      populate: {
-        path: "options",
-      },
-    });
+      const lesson = await LessonModel.findById(lessonId).populate({
+        path: 'questions',
+        populate: {
+          path: 'options',
+        },
+      });
 
-    if (!lesson) {
+      if (!lesson) {
+        return res.status(404).json({
+          message: 'Урок не найден',
+        });
+      }
+
+      res.status(200).json(lesson);
+    } catch (error) {
       return res.status(404).json({
-        message: "Урок не найден",
+        message: 'Урок не найден',
       });
     }
-
-    res.status(200).json(lesson);
   }
 
   static async create(req, res) {
     try {
-      const lessonCategory = await CategoryModel.findOne({ _id: req.body.categoryId });
+      const lessonCategory = await CategoryModel.findOne({
+        _id: req.body.categoryId,
+      });
 
       if (!lessonCategory) {
         return res.status(404).json({
-          message: "Нет такой категории",
+          message: 'Нет такой категории',
         });
       }
 
-      if (req.userInfo.role == "admin") {
+      if (req.userInfo.role == 'admin') {
         const doc = new LessonModel({
           title: req.body.title,
           content: req.body.content,
-          videoUrl: "/uploads/" + req.file.filename,
+          videoUrl: '/uploads/' + req.file.filename,
           categoryId: req.body.categoryId,
         });
 
@@ -90,13 +102,13 @@ class lessonController {
         return res.status(200).json(newLesson);
       } else {
         return res.status(403).json({
-          message: "Вы не можете создавать уроки",
+          message: 'Вы не можете создавать уроки',
         });
       }
     } catch (error) {
       console.log(error);
       res.status(500).json({
-        message: "Не удалось создать урок",
+        message: 'Не удалось создать урок',
       });
     }
   }
@@ -108,11 +120,11 @@ class lessonController {
 
       if (!lesson) {
         return res.status(404).json({
-          message: "Урок не найден",
+          message: 'Урок не найден',
         });
       }
 
-      if (req.userInfo.role === "admin") {
+      if (req.userInfo.role === 'admin') {
         const questions = await QuestionModel.find({ lesson: lessonId });
 
         for (const question of questions) {
@@ -121,7 +133,7 @@ class lessonController {
 
         await QuestionModel.deleteMany({ lesson: lessonId });
 
-        const videoPath = path.join(__dirname, "../", lesson.videoUrl);
+        const videoPath = path.join(__dirname, '../', lesson.videoUrl);
         if (fs.existsSync(videoPath)) {
           fs.unlinkSync(videoPath);
         }
@@ -130,17 +142,17 @@ class lessonController {
 
         return res.status(200).json({
           removedLesson,
-          message: "Урок и вопросы успешно удалены",
+          message: 'Урок и вопросы успешно удалены',
         });
       } else {
         return res.status(403).json({
-          message: "Вы не можете удалять уроки",
+          message: 'Вы не можете удалять уроки',
         });
       }
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        message: "Не удалось удалить урок",
+        message: 'Не удалось удалить урок',
       });
     }
   }
@@ -149,28 +161,33 @@ class lessonController {
     try {
       const currentUser = await UserModel.findById(req.userInfo._id);
       const workPosition = currentUser.workPosition;
-      const currentUserCategory = await CategoryModel.findOne({ categoryName: workPosition });
+      const currentUserCategory = await CategoryModel.findOne({
+        categoryName: workPosition,
+      });
 
-      const regex = new RegExp(req.body.searchTitle, "i");
+      const regex = new RegExp(req.body.searchTitle, 'i');
 
-      if (req.userInfo.role == "user") {
-        const lessons = await LessonModel.find({ title: regex, categoryId: currentUserCategory._id });
+      if (req.userInfo.role == 'user') {
+        const lessons = await LessonModel.find({
+          title: regex,
+          categoryId: currentUserCategory._id,
+        });
 
         if (lessons.length === 0) {
           return res.status(404).json({
-            message: "Такой урок не найден",
+            message: 'Такой урок не найден',
           });
         }
 
         return res.json(lessons);
       }
 
-      if (req.userInfo.role == "admin") {
+      if (req.userInfo.role == 'admin') {
         const lessons = await LessonModel.find({ title: regex });
 
         if (lessons.length === 0) {
           return res.status(404).json({
-            message: "Такой урок не найден",
+            message: 'Такой урок не найден',
           });
         }
 
@@ -178,7 +195,7 @@ class lessonController {
       }
     } catch (error) {
       res.status(404).json({
-        message: "Такой урок не найден",
+        message: 'Такой урок не найден',
       });
     }
   }
@@ -192,15 +209,15 @@ class lessonController {
       const answers = req.body.answers;
 
       const lesson = await LessonModel.findById(lessonId).populate({
-        path: "questions",
+        path: 'questions',
         populate: {
-          path: "options",
+          path: 'options',
         },
       });
 
       if (!lesson) {
         return res.status(404).json({
-          message: "Урок не найден",
+          message: 'Урок не найден',
         });
       }
 
@@ -228,7 +245,7 @@ class lessonController {
     } catch (error) {
       console.log(error);
       res.status(500).json({
-        message: "Не удалось сохранить результат",
+        message: 'Не удалось сохранить результат',
       });
     }
   }
