@@ -5,6 +5,13 @@ import ResultModel from "../models/Result.js";
 import QuestionModel from "../models/Question.js";
 import OptionModel from "../models/Option.js";
 
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 class lessonController {
   static async getAll(req, res) {
     try {
@@ -112,6 +119,12 @@ class lessonController {
         }
 
         await QuestionModel.deleteMany({ lesson: lessonId });
+
+        const videoPath = path.join(__dirname, "../", lesson.videoUrl);
+        if (fs.existsSync(videoPath)) {
+          fs.unlinkSync(videoPath);
+        }
+
         const removedLesson = await LessonModel.findByIdAndRemove(lessonId);
 
         return res.status(200).json({
