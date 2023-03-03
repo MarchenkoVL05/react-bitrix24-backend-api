@@ -8,7 +8,6 @@ import OptionModel from "../models/Option.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import Lesson from "../models/Lesson.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
