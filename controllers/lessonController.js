@@ -57,12 +57,14 @@ class lessonController {
     try {
       const lessonId = req.params.lessonId;
 
-      const lesson = await LessonModel.findById(lessonId).populate({
-        path: "questions",
-        populate: {
-          path: "options",
-        },
-      });
+      const lesson = await LessonModel.findById(lessonId)
+        .populate({
+          path: "questions",
+          populate: {
+            path: "options",
+          },
+        })
+        .populate("categoryId");
 
       if (!lesson) {
         return res.status(404).json({
@@ -70,7 +72,17 @@ class lessonController {
         });
       }
 
-      res.status(200).json(lesson);
+      if (req.userInfo.role == "admin") {
+        return res.status(200).json(lesson);
+      }
+
+      if (lesson.categoryId.categoryName == req.userInfo.workPosition) {
+        return res.status(200).json(lesson);
+      } else {
+        return res.status(404).json({
+          message: "Урок другого отдела",
+        });
+      }
     } catch (error) {
       return res.status(404).json({
         message: "Урок не найден",

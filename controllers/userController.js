@@ -35,6 +35,7 @@ class userController {
           _id: user._id,
           role: user.role,
           approved: user.approved,
+          workPosition: user.workPosition,
         },
         process.env.SECRET_KEY,
         {
@@ -77,6 +78,7 @@ class userController {
           _id: user._id,
           role: user.role,
           approved: user.approved,
+          workPosition: user.workPosition,
         },
         process.env.SECRET_KEY,
         {
