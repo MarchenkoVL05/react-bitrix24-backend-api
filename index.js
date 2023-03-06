@@ -27,7 +27,7 @@ mongoose
     console.log("DB is connected");
   });
 
-app.listen(4444, (error) => {
+app.listen(PORT, (error) => {
   if (error) {
     console.log("Ошибка сервера: ", error);
   }
