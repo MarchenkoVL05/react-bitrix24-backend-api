@@ -25,19 +25,25 @@ class categoryController {
   }
 
   static async create(req, res) {
-    const categoryName = req.body.categoryName;
+    try {
+      const categoryName = req.body.categoryName;
 
-    if (req.userInfo.role == "admin") {
-      const doc = new CategoryModel({
-        categoryName,
-      });
+      if (req.userInfo.role == "admin") {
+        const doc = new CategoryModel({
+          categoryName,
+        });
 
-      const category = await doc.save();
+        const category = await doc.save();
 
-      return res.json(category);
-    } else {
-      res.status(403).json({
-        message: "У вас нет прав на создание категории",
+        return res.json(category);
+      } else {
+        res.status(403).json({
+          message: "У вас нет прав на создание категории",
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: "Не удалось сохранить отдел",
       });
     }
   }
