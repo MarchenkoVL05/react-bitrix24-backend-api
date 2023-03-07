@@ -20,6 +20,10 @@ const LessonSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    duration: {
+      type: Number,
+      default: 0,
+    },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

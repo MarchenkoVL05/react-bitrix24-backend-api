@@ -13,6 +13,8 @@ import ffmpeg from "fluent-ffmpeg";
 import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
 
+import { getVideoDurationInSeconds } from "get-video-duration";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -132,12 +134,15 @@ class lessonController {
           filename: thumbnailName,
         });
 
+      let videoDuration = await getVideoDurationInSeconds(videoPath);
+
       // Создаём урок
       const doc = new LessonModel({
         title: req.body.title,
         content: req.body.content,
         videoUrl: "/uploads/" + req.file.filename,
         thumbnail: "/uploads/thumbnails/" + req.file.filename.split(".")[0] + ".png",
+        duration: Math.floor(videoDuration),
         categoryId: req.body.categoryId,
       });
 
