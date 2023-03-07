@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 import UserModel from "../models/User.js";
 import CategoryModel from "../models/Category.js";
 import ResultModel from "../models/Result.js";
-import User from "../models/User.js";
 
 class userController {
   static async registration(req, res) {

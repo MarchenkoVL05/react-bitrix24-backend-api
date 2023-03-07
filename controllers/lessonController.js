@@ -270,8 +270,6 @@ class lessonController {
 
   static async checkAnswers(req, res) {
     try {
-      let score = 0;
-
       const lessonId = req.params.id;
       const userId = req.userInfo._id;
       const answers = req.body.answers;
@@ -290,10 +288,13 @@ class lessonController {
       }
 
       let questionCounter = 0;
+      let score = 0;
 
       lesson.questions.forEach((question) => {
-        questionCounter++;
         question.options.forEach((option) => {
+          if (option.right) {
+            questionCounter++;
+          }
           if (option.right && answers.includes(option._id.toString())) {
             score++;
           }
