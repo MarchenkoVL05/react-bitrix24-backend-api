@@ -9,8 +9,15 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import ffmpeg from "fluent-ffmpeg";
+import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
+import { path as ffprobePath } from "@ffprobe-installer/ffprobe";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
 class lessonController {
   static async getAll(req, res) {
@@ -101,21 +108,41 @@ class lessonController {
         });
       }
 
-      if (req.userInfo.role == "admin") {
-        const doc = new LessonModel({
-          title: req.body.title,
-          content: req.body.content,
-          videoUrl: "/uploads/" + req.file.filename,
-          categoryId: req.body.categoryId,
-        });
-
-        const newLesson = await doc.save();
-        return res.status(200).json(newLesson);
-      } else {
+      if (req.userInfo.role != "admin") {
         return res.status(403).json({
           message: "Вы не можете создавать уроки",
         });
       }
+
+      const videoPath = req.file.path;
+      const thumbnailPath = req.file.destination + "/thumbnails/";
+
+      const videoName = req.file.filename;
+      const thumbnailName = videoName.replace(/\.[^/.]+$/, "") + ".png";
+
+      // Создём превью
+      ffmpeg(videoPath)
+        .on("end", () => {
+          console.log("Thumbnail generated");
+        })
+        .screenshots({
+          count: 1,
+          folder: thumbnailPath,
+          size: "320x240",
+          filename: thumbnailName,
+        });
+
+      // Создаём урок
+      const doc = new LessonModel({
+        title: req.body.title,
+        content: req.body.content,
+        videoUrl: "/uploads/" + req.file.filename,
+        thumbnail: "/uploads/thumbnails/" + req.file.filename.split(".")[0] + ".png",
+        categoryId: req.body.categoryId,
+      });
+
+      const newLesson = await doc.save();
+      return res.status(200).json(newLesson);
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -147,6 +174,11 @@ class lessonController {
         const videoPath = path.join(__dirname, "../", lesson.videoUrl);
         if (fs.existsSync(videoPath)) {
           fs.unlinkSync(videoPath);
+        }
+
+        const thumbnail = path.join(__dirname, "../", lesson.thumbnail);
+        if (fs.existsSync(thumbnail)) {
+          fs.unlinkSync(thumbnail);
         }
 
         const removedLesson = await LessonModel.findByIdAndRemove(lessonId);

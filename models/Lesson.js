@@ -16,6 +16,10 @@ const LessonSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    thumbnail: {
+      type: String,
+      default: "",
+    },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
