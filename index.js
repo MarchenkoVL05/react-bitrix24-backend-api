@@ -15,23 +15,6 @@ app.use("/uploads", express.static("uploads"));
 
 app.use("/api", router);
 
-app.get("/generate-thumbnail", (req, res) => {
-  const videoPath = __dirname + "/uploads/Big_Buck_Bunny_1080_10s_1MB.mp4";
-  const thumbnailPath = __dirname + "/uploads/thumbnails/";
-
-  ffmpeg(videoPath)
-    .on("end", () => {
-      console.log("Screenshots taken");
-      res.send("Screenshots taken");
-    })
-    .screenshots({
-      count: 1,
-      folder: thumbnailPath,
-      size: "320x240",
-      filename: "thumbnail.png",
-    });
-});
-
 const PORT = process.env.PORT || 4444;
 
 mongoose.set("strictQuery", false);
