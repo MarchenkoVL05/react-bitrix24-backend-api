@@ -15,7 +15,6 @@ router.post("/search", checkAuth, lessonController.searchLesson);
 // Фильтр уроков
 router.post("/filter", checkAuth, lessonController.filderLessonsByCategory);
 
-router.post("/:id", checkAuth, lessonController.checkAnswers);
 router.post(
   "/",
   checkAuth,
