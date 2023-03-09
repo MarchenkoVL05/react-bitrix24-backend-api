@@ -92,9 +92,10 @@ class questionController {
         const optionsIds = question.options;
 
         await OptionModel.deleteMany({ _id: { $in: optionsIds } });
-        await QuestionModel.findByIdAndRemove(questionId);
+        const removedQuestion = await QuestionModel.findByIdAndRemove(questionId);
 
         res.status(200).json({
+          removedQuestion,
           message: "Вопрос успешно удалён",
         });
       } else {
