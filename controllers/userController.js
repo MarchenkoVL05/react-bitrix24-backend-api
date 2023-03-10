@@ -187,6 +187,21 @@ class userController {
     }
   }
 
+  static async removeUser(req, res) {
+    try {
+      const userId = req.body.userId;
+
+      const removedUser = await UserModel.findByIdAndRemove(userId);
+
+      res.status(200).json(removedUser);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Не удалось удалить пользователя",
+      });
+    }
+  }
+
   static async allResults(req, res) {
     try {
       if (req.userInfo.role == "admin") {
