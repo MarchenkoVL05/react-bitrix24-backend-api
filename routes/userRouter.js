@@ -20,7 +20,4 @@ router.post("/role", checkAuth, userController.makeAdmin);
 // Удалить ученика
 router.delete("/remove", checkAuth, userController.removeUser);
 
-// Все результаты
-router.get("/results", checkAuth, userController.allResults);
-
 export default router;
