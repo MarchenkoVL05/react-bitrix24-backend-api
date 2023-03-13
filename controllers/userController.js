@@ -229,6 +229,48 @@ class userController {
     }
   }
 
+  static async makeAdmin(req, res) {
+    try {
+      const userId = req.body.userId;
+
+      if (req.userInfo.role == "admin") {
+        UserModel.findByIdAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            role: "admin",
+          },
+          {
+            returnDocument: "after",
+          },
+          (error, changedUser) => {
+            if (error) {
+              return res.status(500).json({
+                message: "Не удалось закрыть доступ ученику",
+              });
+            } else {
+              const updatedUser = { ...changedUser._doc, role: "admin" };
+              return res.json({
+                changedUser: updatedUser,
+                message: "Ученику закрыт доступ",
+              });
+            }
+          }
+        );
+      } else {
+        res.status(500).json({
+          message: "Вы не можете изменить роль",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Не удалось сменить роль",
+      });
+    }
+  }
+
   static async removeUser(req, res) {
     try {
       const userId = req.body.userId;
