@@ -187,6 +187,48 @@ class userController {
     }
   }
 
+  static async blockAccess(req, res) {
+    try {
+      const userId = req.body.userId;
+
+      if (req.userInfo.role == "admin") {
+        UserModel.findOneAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            approved: false,
+          },
+          {
+            returnDocument: "after",
+          },
+          (error, approvedUser) => {
+            if (error) {
+              return res.status(500).json({
+                message: "Не удалось закрыть доступ ученику",
+              });
+            } else {
+              const updatedUser = { ...approvedUser._doc, approved: false };
+              return res.json({
+                approvedUser: updatedUser,
+                message: "Ученику закрыт доступ",
+              });
+            }
+          }
+        );
+      } else {
+        return res.status(403).json({
+          message: "У вас нет прав",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Ошибка при закрытии доступа ученику",
+      });
+    }
+  }
+
   static async removeUser(req, res) {
     try {
       const userId = req.body.userId;

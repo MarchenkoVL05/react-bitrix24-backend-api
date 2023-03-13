@@ -12,6 +12,7 @@ router.get("/getMe", userController.getMe);
 
 router.get("/all", checkAuth, userController.getAll);
 router.post("/approve", checkAuth, userController.approve);
+router.post("/block", checkAuth, userController.blockAccess);
 router.delete("/remove", checkAuth, userController.removeUser);
 
 // Все результаты
