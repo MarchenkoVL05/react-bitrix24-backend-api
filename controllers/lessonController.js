@@ -3,6 +3,7 @@ import CategoryModel from "../models/Category.js";
 import UserModel from "../models/User.js";
 import QuestionModel from "../models/Question.js";
 import OptionModel from "../models/Option.js";
+import ResultModel from "../models/Result.js";
 
 import fs from "fs";
 import path from "path";
@@ -167,6 +168,9 @@ class lessonController {
       }
 
       if (req.userInfo.role === "admin") {
+        // Удалить результаты тестов за этот урок
+        await ResultModel.deleteMany({ lesson: lessonId });
+
         const questions = await QuestionModel.find({ lesson: lessonId });
 
         for (const question of questions) {
