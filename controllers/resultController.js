@@ -1,4 +1,5 @@
 import ResultModel from "../models/Result.js";
+import UserModel from "../models/User.js";
 
 import passTest from "../services/passTest.js";
 
@@ -39,6 +40,18 @@ class resultController {
       }
 
       const removedResult = await ResultModel.findByIdAndRemove(resultId);
+
+      // Найди пользователя результат которого удаляем
+      const resultUser = await UserModel.findById(removedResult.user);
+
+      // Если мы удаляем его успешную попытку, то уменьши количество уроков к которым допущен ученик
+      const t = (removedResult.score / removedResult.questionCounter) * 100;
+
+      if (t >= 75) {
+        await UserModel.findByIdAndUpdate(resultUser._id, {
+          $inc: { lessonsAccessed: -1 },
+        });
+      }
 
       res.status(200).json(removedResult);
     } catch (error) {
