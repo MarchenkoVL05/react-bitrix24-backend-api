@@ -1,5 +1,6 @@
-import LessonModel from "../models/Lesson.js";
 import ResultModel from "../models/Result.js";
+
+import passTest from "../services/passTest.js";
 
 class resultController {
   static async allResults(req, res) {
@@ -49,48 +50,42 @@ class resultController {
   }
 
   static async checkAnswers(req, res) {
+    // Функция сохранит первую удачную попытку и будет отдавать её на фронт
+    // (+ сохранит все неудачные предыдущие)
     try {
       const lessonId = req.params.id;
       const userId = req.userInfo._id;
-      const answers = req.body.answers;
 
-      const lesson = await LessonModel.findById(lessonId).populate({
-        path: "questions",
-        populate: {
-          path: "options",
-        },
-      });
-
-      if (!lesson) {
-        return res.status(404).json({
-          message: "Урок не найден",
-        });
-      }
-
-      let questionCounter = 0;
-      let score = 0;
-
-      lesson.questions.forEach((question) => {
-        question.options.forEach((option) => {
-          if (option.right) {
-            questionCounter++;
-          }
-          if (option.right && answers.includes(option._id.toString())) {
-            score++;
-          }
-        });
-      });
-
-      const userResult = new ResultModel({
+      // Найдём все результаты ученика за этот урок
+      const userResults = await ResultModel.find({
         user: userId,
         lesson: lessonId,
-        score,
-        questionCounter,
       });
 
-      await userResult.save();
+      // Если ученик ещё не проходил урок - сдай тест, иначе проверь старые попытки
+      if (userResults.length !== 0) {
+        // right - усешные попытки за этот урок
+        let right = [];
+        userResults.forEach((result) => {
+          const t = (result.score / result.questionCounter) * 100;
+          if (t >= 75) {
+            right.push(result);
+          } else {
+            return;
+          }
+        });
 
-      res.json(userResult);
+        // Если ученик уже успешно сдал этот тест - отдай ему старый результат, иначе сдай тест
+        if (right.length !== 0) {
+          right.forEach((result) => {
+            return res.json(result);
+          });
+        } else {
+          passTest(req, res);
+        }
+      } else {
+        passTest(req, res);
+      }
     } catch (error) {
       console.log(error);
       res.status(500).json({
