@@ -7,6 +7,8 @@ const router = new Router();
 
 // Получить таблицу результатов
 router.get("/", checkAuth, resultController.allResults);
+// Удали прогресс
+router.delete("/progress", checkAuth, resultController.removeProgress);
 // Проверить ответы
 router.post("/:id", checkAuth, resultController.checkAnswers);
 // Удалить результат ученика

@@ -62,6 +62,35 @@ class resultController {
     }
   }
 
+  static async removeProgress(req, res) {
+    try {
+      const progress = req.body.progress;
+
+      const removedResults = [];
+      let resultUser = null;
+      for (const [index, progressItem] of progress.entries()) {
+        const removingResult = await ResultModel.findByIdAndRemove(progressItem._id);
+        removedResults.push(removingResult);
+
+        if (index == 0) {
+          // Найди пользователя результат которого удаляем
+          resultUser = await UserModel.findById(removingResult.user);
+        }
+      }
+
+      await UserModel.findByIdAndUpdate(resultUser._id, {
+        $inc: { lessonsAccessed: -removedResults.length },
+      });
+
+      res.status(200).json(removedResults);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "Не удалось удалить прогресс",
+      });
+    }
+  }
+
   static async checkAnswers(req, res) {
     // Функция сохранит первую удачную попытку и будет отдавать её на фронт
     // (+ сохранит все неудачные предыдущие)
