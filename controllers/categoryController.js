@@ -67,9 +67,13 @@ class categoryController {
           await ResultModel.deleteMany({ lesson: lesson._id });
 
           const videoPath = path.join(__dirname, "../", lesson.videoUrl);
-
           if (fs.existsSync(videoPath)) {
             fs.unlinkSync(videoPath);
+          }
+
+          const thumbnail = path.join(__dirname, "../", lesson.thumbnail);
+          if (fs.existsSync(thumbnail)) {
+            fs.unlinkSync(thumbnail);
           }
 
           await LessonModel.findByIdAndRemove(lesson._id);
