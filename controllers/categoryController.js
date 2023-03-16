@@ -2,6 +2,7 @@ import CategoryModel from "../models/Category.js";
 import LessonModel from "../models/Lesson.js";
 import QuestionModel from "../models/Question.js";
 import OptionModel from "../models/Option.js";
+import ResultModel from "../models/Result.js";
 
 import fs from "fs";
 import path from "path";
@@ -63,6 +64,7 @@ class categoryController {
           }
 
           await QuestionModel.deleteMany({ lesson: lesson._id });
+          await ResultModel.deleteMany({ lesson: lesson._id });
 
           const videoPath = path.join(__dirname, "../", lesson.videoUrl);
 
