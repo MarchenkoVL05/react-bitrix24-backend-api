@@ -168,8 +168,58 @@ class lessonController {
       }
 
       if (req.userInfo.role === "admin") {
-        // Удалить результаты тестов за этот урок
+        // При удалении урока => обновлять прогресс учеников
+        const successedResults = [];
+        const results = await ResultModel.find({ lesson: lessonId });
+        for (const result of results) {
+          if (result.score / result.questionCounter >= 0.75) {
+            successedResults.push(result);
+          }
+        }
+
+        let progressOfUsersToRemove = [];
+        if (successedResults.length !== 0) {
+          for (const result of successedResults) {
+            const userSuccessfulResults = [];
+            const currentUser = await UserModel.findById(result.user);
+            const userResults = await ResultModel.find({ user: currentUser._id });
+
+            userResults.forEach((result) => {
+              if (result.score / result.questionCounter >= 0.75) {
+                userSuccessfulResults.push(result);
+              }
+            });
+
+            let resultsOfProgress = [];
+            const currentLessonResultIndex = userSuccessfulResults.findIndex((result) => result.lesson == lessonId);
+            userSuccessfulResults.slice(currentLessonResultIndex).forEach((result) => {
+              resultsOfProgress.push(result);
+            });
+
+            progressOfUsersToRemove = [...progressOfUsersToRemove, resultsOfProgress];
+          }
+        }
+
+        // Удали прогресс у каждого ученика кто продвинулся дальше по урокам
+        if (progressOfUsersToRemove.length !== 0) {
+          for (const userProgress of progressOfUsersToRemove) {
+            for (const result of userProgress) {
+              await ResultModel.findByIdAndDelete(result._id);
+              // lessonsAccessed не должен быть меньше 1
+              const user = await UserModel.findById(result.user);
+
+              if (user.lessonsAccessed > 1) {
+                await UserModel.findByIdAndUpdate(result.user, {
+                  $inc: { lessonsAccessed: -1 },
+                });
+              }
+            }
+          }
+        }
+
+        // Удали все результаты за этот удаляемый урок
         await ResultModel.deleteMany({ lesson: lessonId });
+        //----------------------------------------------
 
         const questions = await QuestionModel.find({ lesson: lessonId });
 
