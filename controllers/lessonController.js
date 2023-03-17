@@ -25,37 +25,33 @@ class lessonController {
   static async getAll(req, res) {
     try {
       if (req.userInfo.role == "admin") {
-        const lessons = await LessonModel.find();
+        const lessons = await LessonModel.find().sort({ course: 1, created_at: 1 });
         return res.status(200).json(lessons);
-      }
-      if (req.userInfo.role == "user") {
+      } else if (req.userInfo.role == "user") {
         const currentUser = await UserModel.findById(req.userInfo._id);
         if (currentUser.approved) {
           const workPosition = currentUser.workPosition;
-
           const currentUserCategory = await CategoryModel.findOne({
             categoryName: workPosition,
           });
-
           if (!currentUserCategory) {
             return res.json({
               message: "Нет уроков для Вас",
             });
           }
-
           const lessons = await LessonModel.find({
             categoryId: currentUserCategory._id,
           });
           return res.status(200).json(lessons);
         } else {
-          res.status(403).json({
+          return res.status(403).json({
             message: req.userInfo.approved,
           });
         }
       }
     } catch (error) {
       console.log(error);
-      res.status(500).json({
+      return res.status(500).json({
         message: "Не удалось загрузить уроки",
       });
     }
