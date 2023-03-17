@@ -24,10 +24,6 @@ const LessonSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    course: {
-      type: String,
-      default: "",
-    },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

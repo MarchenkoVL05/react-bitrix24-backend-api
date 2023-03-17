@@ -25,7 +25,7 @@ class lessonController {
   static async getAll(req, res) {
     try {
       if (req.userInfo.role == "admin") {
-        const lessons = await LessonModel.find().sort({ course: 1, created_at: 1 });
+        const lessons = await LessonModel.find();
         return res.status(200).json(lessons);
       } else if (req.userInfo.role == "user") {
         const currentUser = await UserModel.findById(req.userInfo._id);
